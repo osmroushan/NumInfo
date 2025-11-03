@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Osm🥰 Number Checker</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>📲 Osm🥰 Number Checker</h1>
+    <p>Enter 10-digit number below to check info</p>
+
+    <form id="checkForm">
+      <input type="text" id="number" name="number" maxlength="10" placeholder="Enter number..." required>
+      <button type="submit">Check 🔍</button>
+    </form>
+
+    <div id="resultBox" class="result-box"></div>
+    <button id="copyBtn" style="display:none;">📋 Copy Result</button>
+  </div>
+
+  <script>
+    const form = document.getElementById('checkForm');
+    const resultBox = document.getElementById('resultBox');
+    const copyBtn = document.getElementById('copyBtn');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(form);
+      resultBox.innerHTML = "⏳ Checking...";
+      copyBtn.style.display = "none";
+
+      const res = await fetch('/check', { method: 'POST', body: formData });
+      const data = await res.json();
+
+      if (data.error) {
+        resultBox.innerHTML = `<span class="error">${data.error}</span>`;
+      } else {
+        resultBox.innerHTML = `<div class="output">${data.result}</div>`;
+        copyBtn.style.display = "block";
+      }
+    });
+
+    copyBtn.addEventListener('click', () => {
+      navigator.clipboard.writeText(resultBox.innerText);
+      copyBtn.innerText = "✅ Copied!";
+      setTimeout(() => copyBtn.innerText = "📋 Copy Result", 2000);
+    });
+  </script>
+</body>
+</html>
