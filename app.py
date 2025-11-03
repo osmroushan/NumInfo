@@ -4,9 +4,11 @@ from urllib.parse import quote_plus
 
 app = Flask(__name__)
 
+# === API Base URL ===
 API_BASE = "https://numapi.anshapi.workers.dev/?num="
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
+# === Helper Functions ===
 def api_call(number):
     url = API_BASE + quote_plus(number)
     r = requests.get(url, timeout=20, verify=False)
@@ -29,8 +31,12 @@ def format_result(raw, number):
     except Exception:
         return f"<pre>{raw}</pre>"
 
-@app.route('/')
+# === Routes ===
+@app.route('/', methods=['GET', 'HEAD'])
 def home():
+    if request.method == 'HEAD':
+        # Render health-check (no body needed)
+        return '', 200
     return render_template('index.html')
 
 @app.route('/check', methods=['POST'])
@@ -45,5 +51,6 @@ def check_number():
     except Exception as e:
         return jsonify({"error": f"⚠️ API Error: {e}"})
 
+# === Run Locally ===
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)
